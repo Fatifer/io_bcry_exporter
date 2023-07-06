@@ -268,7 +268,9 @@ class _TIFConverter:
                     self.__create_normal_texture()
                 except:
                     bcPrint("Failed to invert green channel")
-
+                
+                print("ALSOALSOALSOALSO")
+                print(rc_params)
                 rc_process = run_rc(self.__config.texture_rc_path,
                                     tiff_image_for_rc,
                                     rc_params)
@@ -340,16 +342,59 @@ class _TIFConverter:
 
         return tmp_file_path
 
+    #added to save tiff with custom compression
+    # def save_animage_as(image: bpy.types.Image, path: str=bpy.app.tempdir, name: str='Untitled', file_format: str='PNG', color: str='RGBA', color_depth: str='8', compression: int=15):
+    #     scene = bpy.data.scenes.new("Temp")
+        
+    #     show_name = image.name
+    #     image.name = name
+        
+    #     # use docs.blender.org/api/current/bpy.types.ImageFormatSettings.html for more properties
+    #     settings = scene.render.image_settings
+    #     settings.file_format = file_format  # Options: 'BMP', 'IRIS', 'PNG', 'JPEG', 'JPEG2000', 'TARGA', 'TARGA_RAW', 'CINEON', 'DPX', 'OPEN_EXR_MULTILAYER', 'OPEN_EXR', 'HDR', 'TIFF', 'WEBP'
+    #     settings.color_mode = color  # Options: 'BW', 'RGB', 'RGBA' (depends on file_format)
+    #     settings.color_depth = color_depth  # Options: '8', '10', '12', '16', '32' (depends on file_format)
+    #     settings.compression = compression  # Range: 0 - 100
+        
+    #     # save images with above settings
+    #     if not os.path.isfile(path):
+    #         path = os.path.join(path, name)
+    #     image.save_render(path, scene)
+        
+    #     bpy.data.scenes.remove(scene)
+    #     image.name = show_name
+
     def __save_as_tiff(self, image, tiff_file_path):
         originalPath = image.filepath
 
         try:
-            image.filepath_raw = tiff_file_path
-            image.file_format = 'TIFF'
-            image.save()
+            #scene = bpy.data.scenes.new("Temp")
+            settings = bpy.context.scene.render.image_settings
+            #store current settings
+            format = settings.file_format
+            mode = settings.color_mode
+            depth = settings.color_depth
+            
+            #SETTINGS AND SAVE
+            settings.file_format = 'TIFF'
+            settings.tiff_codec = 'LZW'
+            image.save_render(tiff_file_path)
+            
+            #restore settings
+            settings.file_format = format
+            settings.color_mode = mode
+            settings.color_depth = depth
+            
+            #DOES NOT WORK ANYMORE
+            # image.filepath_raw = tiff_file_path
+            # image.file_format = 'TIFF'
+            # image.save()
+            
 
         finally:
             image.filepath = originalPath
+
+    
 
     def __save_tiffs(self):
         for tmp_image, dest_image in self.__tmp_images.items():
@@ -384,6 +429,9 @@ def run_rc(rc_path, files_to_process, params=None):
     bcPrint("RC Parameters: {}".format(params))
     bcPrint("Processing File: {}".format(files_to_process))
 
+    print("THISTHISTHIS: ")
+    print(process_params)
+    
     try:
         run_object = subprocess.Popen(process_params)
     except:

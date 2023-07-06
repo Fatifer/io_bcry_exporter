@@ -197,7 +197,7 @@ class AddCryExportNode(bpy.types.Operator):
     bl_idname = "object.add_cry_export_node"
     bl_options = {"REGISTER", "UNDO"}
 
-    node_type = EnumProperty(
+    node_type : EnumProperty(
         name="Type",
         items=(
             ("cgf", "CGF",
@@ -211,7 +211,7 @@ class AddCryExportNode(bpy.types.Operator):
         ),
         default="cgf",
     )
-    node_name = StringProperty(name="Name")
+    node_name : StringProperty(name="Name")
 
     def __init__(self):
         #bpy.ops.object.mode_set(mode='OBJECT')
@@ -239,7 +239,7 @@ class AddCryExportNode(bpy.types.Operator):
             scene = bpy.context.scene
             node_name = "{}.{}".format(self.node_name, self.node_type)
             collection = bpy.data.collections.get(node_name)
-            if collection is None:
+            if collection is None:#TODO: make Collection link to a scene collection
                 bpy.ops.collection.create(name=node_name)
             else:
                 for object in bpy.context.selected_objects:
@@ -268,7 +268,7 @@ class AddCryAnimationNode(bpy.types.Operator):
     bl_idname = "object.add_cry_animation_node"
     bl_options = {"REGISTER", "UNDO"}
 
-    node_type = EnumProperty(
+    node_type : EnumProperty(
         name="Type",
         items=(
             ("anm", "ANM",
@@ -278,8 +278,8 @@ class AddCryAnimationNode(bpy.types.Operator):
         ),
         default="i_caf",
     )
-    node_name = StringProperty(name="Animation Name")
-    range_type = EnumProperty(
+    node_name : StringProperty(name="Animation Name")
+    range_type : EnumProperty(
         name="Range Type",
         items=(
             ("Timeline", "Timeline Editor",
@@ -291,10 +291,10 @@ class AddCryAnimationNode(bpy.types.Operator):
         ),
         default="Timeline",
     )
-    node_start = IntProperty(name="Start Frame")
-    node_end = IntProperty(name="End Frame")
-    start_m_name = StringProperty(name="Marker Start Name")
-    end_m_name = StringProperty(name="Marker End Name")
+    node_start : IntProperty(name="Start Frame")
+    node_end : IntProperty(name="End Frame")
+    start_m_name : StringProperty(name="Marker Start Name")
+    end_m_name : StringProperty(name="Marker End Name")
 
     def draw(self, context):
         layout = self.layout
@@ -448,9 +448,9 @@ class ApplyTransforms(bpy.types.Operator):
     bl_idname = "object.apply_transforms"
     bl_options = {'REGISTER', 'UNDO'}
 
-    loc = BoolProperty(name="Location", default=False)
-    rot = BoolProperty(name="Rotation", default=True)
-    scale = BoolProperty(name="Scale", default=True)
+    loc : BoolProperty(name="Location", default=False)
+    rot : BoolProperty(name="Rotation", default=True)
+    scale : BoolProperty(name="Scale", default=True)
 
     def execute(self, context):
         selected = bpy.context.selected_objects
@@ -479,7 +479,7 @@ class FeetOnFloor(bpy.types.Operator):
     bl_idname = "object.feet_on_floor"
     bl_options = {'REGISTER', 'UNDO'}
 
-    z_offset = FloatProperty(name="Z Offset",
+    z_offset : FloatProperty(name="Z Offset",
                              default=0.0, step=0.1, precision=3,
                              description="Z offset for center of object.")
 
@@ -521,12 +521,12 @@ class GenerateLODs(bpy.types.Operator):
     bl_idname = "mesh.generate_lod_meshes"
     bl_options = {'REGISTER', 'UNDO'}
 
-    lod_count = IntProperty(name="LOD Count", default=2, min=1, max=5, step=1,
+    lod_count : IntProperty(name="LOD Count", default=2, min=1, max=5, step=1,
                             description="LOD count to generate.")
-    decimate_ratio = FloatProperty(name="Decimate Ratio", default=0.5,
+    decimate_ratio : FloatProperty(name="Decimate Ratio", default=0.5,
                                    min=0.001, max=1.000, precision=3, step=0.1,
                                    description="Decimate ratio for LODs.")
-    view_offset = FloatProperty(name="View Offset", default=1.5, precision=3,
+    view_offset : FloatProperty(name="View Offset", default=1.5, precision=3,
                                 description="View offset in scene.")
 
     def draw(self, context):
@@ -595,7 +595,7 @@ be converted to the selected shape in CryEngine.'''
     bl_label = "Add Proxy"
     bl_idname = "object.add_proxy"
 
-    type_ = StringProperty()
+    type_ : StringProperty()
 
     def execute(self, context):
         self.__add_proxy(bpy.context.active_object)
@@ -661,38 +661,38 @@ class AddBreakableJoint(bpy.types.Operator):
 
     info = "If you want to use {} joint property. Please enable this."
 
-    draw_size = FloatProperty(name="Joint Size", default=0.1,
+    draw_size : FloatProperty(name="Joint Size", default=0.1,
                               description="Breakable Joint Size")
 
-    is_limit = BoolProperty(name="Use Limit Property", default=True,
+    is_limit : BoolProperty(name="Use Limit Property", default=True,
                             description=info.format('limit'))
-    limit = FloatProperty(name="Limit", default=10.0,
+    limit : FloatProperty(name="Limit", default=10.0,
                           description=desc.list['limit'])
 
-    is_bend = BoolProperty(name="Use Bend Property",
+    is_bend : BoolProperty(name="Use Bend Property",
                            description=info.format('bend'))
-    bend = FloatProperty(name="Bend", description=desc.list['bend'])
+    bend : FloatProperty(name="Bend", description=desc.list['bend'])
 
-    is_twist = BoolProperty(name="Use Twist Property",
+    is_twist : BoolProperty(name="Use Twist Property",
                             description=info.format('twist'))
-    twist = FloatProperty(name="Twist", description=desc.list['twist'])
+    twist : FloatProperty(name="Twist", description=desc.list['twist'])
 
-    is_pull = BoolProperty(name="Use Pull Property",
+    is_pull : BoolProperty(name="Use Pull Property",
                            description=info.format('pull'))
-    pull = FloatProperty(name="Pull", description=desc.list['pull'])
+    pull : FloatProperty(name="Pull", description=desc.list['pull'])
 
-    is_push = BoolProperty(name="Use Push Property",
+    is_push : BoolProperty(name="Use Push Property",
                            description=info.format('push'))
-    push = FloatProperty(name="Push", description=desc.list['push'])
+    push : FloatProperty(name="Push", description=desc.list['push'])
 
-    is_shift = BoolProperty(name="Use Shift Property",
+    is_shift : BoolProperty(name="Use Shift Property",
                             description=info.format('shift'))
-    shift = FloatProperty(name="Shift", description=desc.list['shift'])
+    shift : FloatProperty(name="Shift", description=desc.list['shift'])
 
-    player_can_break = BoolProperty(name="Player can break",
+    player_can_break : BoolProperty(name="Player can break",
                                     description=desc.list['player_can_break'])
 
-    gameplay_critical = BoolProperty(
+    gameplay_critical : BoolProperty(
         name="Gameplay critical",
         description=desc.list['gameplay_critical'])
 
@@ -873,10 +873,10 @@ class AddMaterialProperties(bpy.types.Operator):
     bl_label = "Add BCRY Exporter material properties to materials"
     bl_idname = "material.add_material_properties"
 
-    material_name = StringProperty(
+    material_name : StringProperty(
         name="Material Name",
         description="Main material name which shown at CryEngine")
-    material_phys = EnumProperty(
+    material_phys : EnumProperty(
         name="Physical Proxy",
         items=(
             ("physDefault", "Default", desc.list['physDefault']),
@@ -980,9 +980,9 @@ class AddMaterial(bpy.types.Operator):
     bl_idname = "material.add_cry_material"
     bl_options = {"REGISTER", "UNDO"}
 
-    material_name = StringProperty(name="Material")
+    material_name : StringProperty(name="Material")
 
-    physics_type = EnumProperty(
+    physics_type : EnumProperty(
         name="Physics",
         items=(
             ("physDefault", "Default", list['physDefault']),
@@ -1040,14 +1040,14 @@ class GenerateMaterials(bpy.types.Operator, ExportHelper):
     bl_label = "Generate Maetrials"
     bl_idname = "material.generate_materials"
     filename_ext = ".mtl"
-    filter_glob = StringProperty(default="*.mtl", options={'HIDDEN'})
+    filter_glob : StringProperty(default="*.mtl", options={'HIDDEN'})
 
-    export_selected_nodes = BoolProperty(
+    export_selected_nodes : BoolProperty(
         name="Just Selected Nodes",
         description="Generate material files just for selected nodes.",
         default=False,
     )
-    convert_textures = BoolProperty(
+    convert_textures : BoolProperty(
         name="Convert Textures",
         description="Converts source textures to DDS while generating materials.",
         default=False,
@@ -1120,7 +1120,7 @@ class EditInverseKinematics(bpy.types.Operator):
 
     info = "Force this bone proxy to be a {} primitive in the engine."
 
-    proxy_type = EnumProperty(
+    proxy_type : EnumProperty(
         name="Physic Proxy",
         items=(
             ("box", "Box", info.format('Box')),
@@ -1130,14 +1130,14 @@ class EditInverseKinematics(bpy.types.Operator):
         ),
         default="capsule")
 
-    is_rotation_lock = BoolVectorProperty(
+    is_rotation_lock : BoolVectorProperty(
         name="Rotation Lock  [X, Y, Z]:",
         description="Bone Rotation Lock X, Y, Z")
 
-    rotation_min = bpy.props.IntVectorProperty(
+    rotation_min : bpy.props.IntVectorProperty(
         name="Rot Limit Min:", description="Bone Rotation Minimum Limit X, Y, Z", default=(
             -180, -180, -180), min=-180, max=0)
-    rotation_max = bpy.props.IntVectorProperty(
+    rotation_max : bpy.props.IntVectorProperty(
         name="Rot Limit Max:",
         description="Bone Rotation Maximum Limit X, Y, Z",
         default=(
@@ -1147,7 +1147,7 @@ class EditInverseKinematics(bpy.types.Operator):
         min=0,
         max=180)
 
-    bone_spring = FloatVectorProperty(
+    bone_spring : FloatVectorProperty(
         name="Spring  [X, Y, Z]:",
         description=desc.list['spring'],
         default=(
@@ -1157,7 +1157,7 @@ class EditInverseKinematics(bpy.types.Operator):
         min=0.0,
         max=1.0)
 
-    bone_spring_tension = FloatVectorProperty(
+    bone_spring_tension : FloatVectorProperty(
         name="Spring Tension  [X, Y, Z]:",
         description=desc.list['spring'],
         default=(
@@ -1167,7 +1167,7 @@ class EditInverseKinematics(bpy.types.Operator):
         min=-3.14159,
         max=3.14159)
 
-    bone_damping = FloatVectorProperty(
+    bone_damping : FloatVectorProperty(
         name="Damping  [X, Y, Z]:",
         description=desc.list['damping'],
         default=(
@@ -1277,13 +1277,13 @@ class EditPhysicProxy(bpy.types.Operator):
 
     ''' "phys_proxy", "colltype_player", "no_explosion_occlusion", "wheel" '''
 
-    is_proxy = BoolProperty(
+    is_proxy : BoolProperty(
         name="Use Physic Proxy",
         description="If you want to use physic proxy properties. Please enable this.")
 
     info = "Force this proxy to be a {} primitive in the engine."
 
-    proxy_type = EnumProperty(
+    proxy_type : EnumProperty(
         name="Physic Proxy",
         items=(
             ("box", "Box", info.format('Box')),
@@ -1294,9 +1294,9 @@ class EditPhysicProxy(bpy.types.Operator):
         ),
         default="box")
 
-    no_exp_occlusion = BoolProperty(name="No Explosion Occlusion",
+    no_exp_occlusion : BoolProperty(name="No Explosion Occlusion",
                                     description=desc.list['no_exp_occlusion'])
-    colltype_player = BoolProperty(name="Colltype Player",
+    colltype_player : BoolProperty(name="Colltype Player",
                                    description=desc.list['colltpye_player'])
 
     object_ = None
@@ -1360,36 +1360,36 @@ class EditRenderMesh(bpy.types.Operator):
 
     ''' "entity", "mass", "density", "pieces", "dynamic", "no_hit_refinement" '''
 
-    is_entity = BoolProperty(name="Entity", description=desc.list['is_entity'])
+    is_entity : BoolProperty(name="Entity", description=desc.list['is_entity'])
 
     info = "If you want to use {} property. Please enable this."
 
-    is_mass = BoolProperty(name="Use Mass", description=info.format('mass'))
-    mass = FloatProperty(name="Mass", description=desc.list['mass'])
+    is_mass : BoolProperty(name="Use Mass", description=info.format('mass'))
+    mass : FloatProperty(name="Mass", description=desc.list['mass'])
 
-    is_density = BoolProperty(
+    is_density : BoolProperty(
         name="Use Density",
         description=info.format('density'))
-    density = FloatProperty(name="Density", description=desc.list['density'])
+    density : FloatProperty(name="Density", description=desc.list['density'])
 
-    is_pieces = BoolProperty(
+    is_pieces : BoolProperty(
         name="Use Pieces",
         description=info.format('pieces'))
-    pieces = FloatProperty(name="Pieces", description=desc.list['pieces'])
+    pieces : FloatProperty(name="Pieces", description=desc.list['pieces'])
 
-    is_dynamic = BoolProperty(
+    is_dynamic : BoolProperty(
         name="Dynamic",
         description=desc.list['is_dynamic'])
 
-    no_hit_refinement = BoolProperty(
+    no_hit_refinement : BoolProperty(
         name="No Hit Refinement",
         description=desc.list['no_hit_refinement'])
 
-    other_rendermesh = BoolProperty(name="Other Rendermesh",
+    other_rendermesh : BoolProperty(name="Other Rendermesh",
                                     description=desc.list['other_rendermesh'])
 
-    hull = BoolProperty(name="Hull", description="Hull for vehicles.")
-    wheel = BoolProperty(name="Wheel", description="Wheel for vehicles.")
+    hull : BoolProperty(name="Hull", description="Hull for vehicles.")
+    wheel : BoolProperty(name="Wheel", description="Wheel for vehicles.")
 
     object_ = None
 
@@ -1465,34 +1465,34 @@ class EditJointNode(bpy.types.Operator):
 
     info = "If you want to use {} joint property. Please enable this."
 
-    is_limit = BoolProperty(name="Use Limit Property",
+    is_limit : BoolProperty(name="Use Limit Property",
                             description=info.format('limit'))
-    limit = FloatProperty(name="Limit", description=desc.list['limit'])
+    limit : FloatProperty(name="Limit", description=desc.list['limit'])
 
-    is_bend = BoolProperty(name="Use Bend Property",
+    is_bend : BoolProperty(name="Use Bend Property",
                            description=info.format('bend'))
-    bend = FloatProperty(name="Bend", description=desc.list['bend'])
+    bend : FloatProperty(name="Bend", description=desc.list['bend'])
 
-    is_twist = BoolProperty(name="Use Twist Property",
+    is_twist : BoolProperty(name="Use Twist Property",
                             description=info.format('twist'))
-    twist = FloatProperty(name="Twist", description=desc.list['twist'])
+    twist : FloatProperty(name="Twist", description=desc.list['twist'])
 
-    is_pull = BoolProperty(name="Use Pull Property",
+    is_pull : BoolProperty(name="Use Pull Property",
                            description=info.format('pull'))
-    pull = FloatProperty(name="Pull", description=desc.list['pull'])
+    pull : FloatProperty(name="Pull", description=desc.list['pull'])
 
-    is_push = BoolProperty(name="Use Push Property",
+    is_push : BoolProperty(name="Use Push Property",
                            description=info.format('push'))
-    push = FloatProperty(name="Push", description=desc.list['push'])
+    push : FloatProperty(name="Push", description=desc.list['push'])
 
-    is_shift = BoolProperty(name="Use Shift Property",
+    is_shift : BoolProperty(name="Use Shift Property",
                             description=info.format('shift'))
-    shift = FloatProperty(name="Shift", description=desc.list['shift'])
+    shift : FloatProperty(name="Shift", description=desc.list['shift'])
 
-    player_can_break = BoolProperty(name="Player can break",
+    player_can_break : BoolProperty(name="Player can break",
                                     description=desc.list['player_can_break'])
 
-    gameplay_critical = BoolProperty(
+    gameplay_critical : BoolProperty(
         name="Gameplay critical",
         description=desc.list['gameplay_critical'])
 
@@ -1569,45 +1569,45 @@ class EditDeformable(bpy.types.Operator):
 
     info = "If you want to use {} deform property. Please enable this."
 
-    is_stiffness = BoolProperty(name="Use Stiffness",
+    is_stiffness : BoolProperty(name="Use Stiffness",
                                 description=info.format('stiffness'))
-    stiffness = FloatProperty(name="Stiffness",
+    stiffness : FloatProperty(name="Stiffness",
                               description=desc.list['stiffness'], default=10.0)
 
-    is_hardness = BoolProperty(name="Use Hardness",
+    is_hardness : BoolProperty(name="Use Hardness",
                                description=info.format('hardness'))
-    hardness = FloatProperty(name="Hardness",
+    hardness : FloatProperty(name="Hardness",
                              description=desc.list['hardness'], default=10.0)
 
-    is_max_stretch = BoolProperty(name="Use Max Stretch",
+    is_max_stretch : BoolProperty(name="Use Max Stretch",
                                   description=info.format('max stretch'))
-    max_stretch = FloatProperty(
+    max_stretch : FloatProperty(
         name="Max Stretch",
         description=desc.list['max_stretch'],
         default=0.01)
 
-    is_max_impulse = BoolProperty(name="Use Max Impulse",
+    is_max_impulse : BoolProperty(name="Use Max Impulse",
                                   description=info.format('max impulse'))
-    max_impulse = FloatProperty(name="Max Impulse",
+    max_impulse : FloatProperty(name="Max Impulse",
                                 description=desc.list['max_impulse'])
 
-    is_skin_dist = BoolProperty(name="Use Skin Dist",
+    is_skin_dist : BoolProperty(name="Use Skin Dist",
                                 description=info.format('skin dist'))
-    skin_dist = FloatProperty(name="Skin Dist",
+    skin_dist : FloatProperty(name="Skin Dist",
                               description=desc.list['skin_dist'])
 
-    is_thickness = BoolProperty(name="Use Thickness",
+    is_thickness : BoolProperty(name="Use Thickness",
                                 description=info.format('thickness'))
-    thickness = FloatProperty(name="Thickness",
+    thickness : FloatProperty(name="Thickness",
                               description=desc.list['thickness'])
 
-    is_explosion_scale = BoolProperty(
+    is_explosion_scale : BoolProperty(
         name="Use Explosion Scale",
         description=info.format('explosion scale'))
-    explosion_scale = FloatProperty(name="Explosion Scale",
+    explosion_scale : FloatProperty(name="Explosion Scale",
                                     description=desc.list['explosion_scale'])
 
-    notaprim = BoolProperty(name="Is not a primitive",
+    notaprim : BoolProperty(name="Is not a primitive",
                             description=desc.list['notaprim'])
 
     object_ = None
@@ -2008,6 +2008,106 @@ class AddUVTexture(bpy.types.Operator):
 #------------------------------------------------------------------------------
 # Bone Utilities:
 #------------------------------------------------------------------------------
+#TODO: ImpMe
+class AddExportPropertyToBone(bpy.types.Operator):
+    '''Click to add a export property to selected bones.'''
+    bl_label = "Add Export Property To Bones"
+    bl_idname = "armature.add_export_property"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def draw(self, context):
+        layout = self.layout
+        col = layout.column()
+        col.prop(self, "forward_direction")
+        col.separator()
+
+        col.prop(self, "bone_length")
+        col.separator()
+
+        col.prop(self, "root_name")
+        col.prop(self, "hips_bone")
+        col.separator()
+
+
+    def invoke(self, context, event):
+        return self.execute(context)
+    
+    def __init__(self):
+        armature = bpy.context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Please select a armature object!")
+            #return {'FINISHED'}
+        
+        
+        #return {'FINISHED'}
+    
+    def execute(self, context):
+        bpy.ops.object.mode_set(mode='EDIT') #bpy.ops.object.mode_set(mode='POSE')
+        for selBone in bpy.context.selected_bones:
+            print(selBone.name)
+            selBone["ExportBone"] = "ExportBone"
+            self.report({'INFO'}, "ExportBone Attribure Added.")
+        bpy.ops.object.mode_set(mode='POSE') #bpy.ops.object.mode_set(mode='POSE')
+        for selBone in bpy.context.selected_pose_bones:
+            print(selBone.name)
+            selBone["ExportBone"] = "ExportBone"
+            self.report({'INFO'}, "ExportBone Attribure Added.")
+        return {'FINISHED'}
+
+
+class RemoveExportPropertyToBone(bpy.types.Operator):
+    '''Click to remove a export property to selected bones.'''
+    bl_label = "Remove Export Property To Bones"
+    bl_idname = "armature.remove_export_property"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def draw(self, context):
+        layout = self.layout
+        col = layout.column()
+        col.prop(self, "forward_direction")
+        col.separator()
+
+        col.prop(self, "bone_length")
+        col.separator()
+
+        col.prop(self, "root_name")
+        col.prop(self, "hips_bone")
+        col.separator()
+
+
+    def invoke(self, context, event):
+        return self.execute(context)
+    
+    def __init__(self):
+        armature = bpy.context.active_object
+        if not armature or armature.type != 'ARMATURE':
+            self.report({'ERROR'}, "Please select a armature object!")
+            #return {'FINISHED'}
+        
+        
+        #return {'FINISHED'}
+    
+    def execute(self, context):
+        bpy.ops.object.mode_set(mode='EDIT') #bpy.ops.object.mode_set(mode='POSE')
+        for selBone in bpy.context.selected_bones:
+            print(selBone.name)
+            if 'ExportBone' in selBone:
+                del selBone["ExportBone"]
+                self.report({'INFO'}, "ExportBone Attribure deleted.")
+            else:
+                self.report({'INFO'}, "No ExportBone Attribure found.")
+                #print("No ExportBone Attribure found. Skip!")
+        bpy.ops.object.mode_set(mode='POSE') #bpy.ops.object.mode_set(mode='POSE')
+        for selBone in bpy.context.selected_pose_bones:
+            print(selBone.name)
+            if 'ExportBone' in selBone:
+                del selBone["ExportBone"]
+                self.report({'INFO'}, "ExportBone Attribure deleted.")
+            else:
+                self.report({'INFO'}, "No ExportBone Attribure found.")
+                #print("No ExportBone Attribure found. Skip!")
+        return {'FINISHED'}
+
 
 class AddRootBone(bpy.types.Operator):
     '''Click to add a root bone to the active armature.'''
@@ -2015,7 +2115,7 @@ class AddRootBone(bpy.types.Operator):
     bl_idname = "armature.add_root_bone"
     bl_options = {'REGISTER', 'UNDO'}
 
-    forward_direction = EnumProperty(
+    forward_direction : EnumProperty(
         name="Forward Direction",
         items=(
             ("y", "+Y",
@@ -2034,10 +2134,10 @@ class AddRootBone(bpy.types.Operator):
         default="y",
     )
 
-    bone_length = FloatProperty(name="Bone Length", default=0.18,
+    bone_length : FloatProperty(name="Bone Length", default=0.18,
                                 description=desc.list['locator_length'])
-    root_name = StringProperty(name="Name", default="Root")
-    hips_bone = StringProperty(name="Hips Bone", default="hips")
+    root_name : StringProperty(name="Name", default="Root")
+    hips_bone : StringProperty(name="Hips Bone", default="hips")
 
     def draw(self, context):
         layout = self.layout
@@ -2122,7 +2222,7 @@ class AddLocatorLocomotion(bpy.types.Operator):
     bl_idname = "armature.add_locator_locomotion"
     bl_options = {'REGISTER', 'UNDO'}
 
-    forward_direction = EnumProperty(
+    forward_direction : EnumProperty(
         name="Forward Direction",
         items=(
             ("y", "+Y",
@@ -2141,22 +2241,22 @@ class AddLocatorLocomotion(bpy.types.Operator):
         default="y",
     )
 
-    bone_length = FloatProperty(name="Bone Length", default=0.15,
+    bone_length : FloatProperty(name="Bone Length", default=0.15,
                                 description=desc.list['locator_length'])
-    root_bone = StringProperty(name="Root Bone", default="Root",
+    root_bone : StringProperty(name="Root Bone", default="Root",
                                description=desc.list['locator_root'])
-    movement_bone = StringProperty(name="Movement Bone", default="hips",
+    movement_bone : StringProperty(name="Movement Bone", default="hips",
                                    description=desc.list['locator_move'])
 
-    x_axis = BoolProperty(
+    x_axis : BoolProperty(
         name="X Axis",
         default=False,
         description="Use X axis from movement reference bone.")
-    y_axis = BoolProperty(
+    y_axis : BoolProperty(
         name="Y Axis",
         default=True,
         description="Use Y axis from movement reference bone.")
-    z_axis = BoolProperty(
+    z_axis : BoolProperty(
         name="Z Axis",
         default=False,
         description="Use Z axis from movement reference bone.")
@@ -2251,7 +2351,7 @@ class AddPrimitiveMesh(bpy.types.Operator):
     bl_idname = "armature.add_primitive_mesh"
     bl_options = {'REGISTER', 'UNDO'}
 
-    root_bone = StringProperty(name="Root Bone", default="Root",
+    root_bone : StringProperty(name="Root Bone", default="Root",
                                description=desc.list['locator_root'])
 
     def draw(self, context):
@@ -2324,46 +2424,46 @@ class PhysicalizeSkeleton(bpy.types.Operator):
     bl_idname = "armature.physicalize_skeleton"
     bl_options = {'REGISTER', 'UNDO'}
 
-    physic_skeleton = BoolProperty(name='Physic Skeleton', default=True,
+    physic_skeleton : BoolProperty(name='Physic Skeleton', default=True,
                                    description='Creates physic skeleton.')
-    physic_proxies = BoolProperty(name='Physic Proxies', default=True,
+    physic_proxies : BoolProperty(name='Physic Proxies', default=True,
                                   description='Creates physic proxies.')
-    physic_proxy_settings = BoolProperty(
+    physic_proxy_settings : BoolProperty(
         name='Physic Proxy Settings',
         default=True,
         description='Fill physic proxy settings to default.')
-    physic_ik_settings = BoolProperty(
+    physic_ik_settings : BoolProperty(
         name='IK Settings',
         default=True,
         description='Fill IK settings to default.')
 
-    radius_torso = FloatProperty(name='Torso Radius', default=0.12,
+    radius_torso : FloatProperty(name='Torso Radius', default=0.12,
                                  min=0.01, precision=3, step=0.1,
                                  description='Torso bones radius')
-    radius_head = FloatProperty(name='Head Radius', default=0.1,
+    radius_head : FloatProperty(name='Head Radius', default=0.1,
                                 min=0.01, precision=3, step=0.1,
                                 description='Head bones radius')
-    radius_arm = FloatProperty(name='Arm Radius', default=0.04,
+    radius_arm : FloatProperty(name='Arm Radius', default=0.04,
                                min=0.01, precision=3, step=0.1,
                                description='Arm bones radius')
-    radius_leg = FloatProperty(name='Leg Radius', default=0.05,
+    radius_leg : FloatProperty(name='Leg Radius', default=0.05,
                                min=0.01, precision=3, step=0.1,
                                description='Leg bones radius')
-    radius_foot = FloatProperty(name='Foot Radius', default=0.05,
+    radius_foot : FloatProperty(name='Foot Radius', default=0.05,
                                 min=0.01, precision=3, step=0.1,
                                 description='Foot bones radius')
-    radius_other = FloatProperty(name='Other Radius', default=0.05,
+    radius_other : FloatProperty(name='Other Radius', default=0.05,
                                  min=0.01, precision=3, step=0.1,
                                  description='Other bones radius')
 
-    physic_materials = BoolProperty(
+    physic_materials : BoolProperty(
         name='Create Physic Materials',
         default=True,
         description='Creates materials for bone proxies.')
-    physic_alpha = FloatProperty(name='Physic Alpha', default=0.2,
+    physic_alpha : FloatProperty(name='Physic Alpha', default=0.2,
                                  min=0.0, max=1.0, step=1.0,
                                  description='Set physic proxy alpha value.')
-    use_single_material = BoolProperty(
+    use_single_material : BoolProperty(
         name='Use Single Material',
         default=False,
         description='Use single material for all bone proxies.')
@@ -2433,7 +2533,7 @@ class PhysicalizeSkeleton(bpy.types.Operator):
                 bone_type = utils.get_bone_type(bone)
                 rd = bone_radius[bone_type]
 
-                bpy.ops.mesh.primitive_cube_add(radius=rd, location=(0, 0, 0))
+                bpy.ops.mesh.primitive_cube_add(size=rd, location=(0, 0, 0))
                 object_ = bpy.context.active_object
                 object_.name = name
                 object_.data.name = name
@@ -2793,9 +2893,9 @@ class ClearSkeletonPhysics(bpy.types.Operator):
     bl_idname = "armature.clear_skeleton_physics"
     bl_options = {'REGISTER', 'UNDO'}
 
-    physic_skeleton = BoolProperty(name='Remove Physic Skeleton', default=True,
+    physic_skeleton : BoolProperty(name='Remove Physic Skeleton', default=True,
                                    description='Removes physic skeleton.')
-    physic_proxies = BoolProperty(name='Clear Physic Proxies', default=True,
+    physic_proxies : BoolProperty(name='Clear Physic Proxies', default=True,
                                   description='Clears physic proxies.')
 
     def __init__(self):
@@ -2854,84 +2954,84 @@ class Export(bpy.types.Operator, ExportHelper):
     bl_label = "Export to CryEngine"
     bl_idname = "scene.export_to_game"
     filename_ext = ".dae"
-    filter_glob = StringProperty(default="*.dae", options={'HIDDEN'})
+    filter_glob : StringProperty(default="*.dae", options={'HIDDEN'})
 
-    apply_modifiers = BoolProperty(
+    apply_modifiers : BoolProperty(
         name="Apply Modifiers",
         description="Apply all modifiers for objects before exporting.",
         default=True,
     )
-    merge_all_nodes = BoolProperty(
+    merge_all_nodes : BoolProperty(
         name="Merge All Nodes",
         description=desc.list["merge_all_nodes"],
         default=False,
     )
-    export_selected_nodes = BoolProperty(
+    export_selected_nodes : BoolProperty(
         name="Export Selected Nodes",
         description="Just exports selected nodes.",
         default=False,
     )
-    custom_normals = BoolProperty(
+    custom_normals : BoolProperty(
         name="Use Custom Normals",
         description="Use custom normals.",
         default=False,
     )
-    vcloth_pre_process = BoolProperty(
+    vcloth_pre_process : BoolProperty(
         name="VCloth Pre-Process",
         description="Export skin as simulating mesh for VCloth V2.",
         default=False,
     )
-    generate_materials = BoolProperty(
+    generate_materials : BoolProperty(
         name="Generate Materials",
         description="Generate material files for CryEngine.",
         default=False,
     )
-    convert_textures = BoolProperty(
+    convert_textures : BoolProperty(
         name="Convert Textures",
         description="Converts source textures to DDS while exporting materials.",
         default=False,
     )
-    make_chrparams = BoolProperty(
+    make_chrparams : BoolProperty(
         name="Make CHRPARAMS File",
         description="Create a base CHRPARAMS file for character animations.",
         default=False,
     )
-    make_cdf = BoolProperty(
+    make_cdf : BoolProperty(
         name="Make CDF File",
         description="Create a base CDF file for character attachments.",
         default=False,
     )
-    fix_weights = BoolProperty(
+    fix_weights : BoolProperty(
         name="Fix Weights",
         description="For use with .chr files. Generally a good idea.",
         default=False,
     )
-    export_for_lumberyard = BoolProperty(
+    export_for_lumberyard : BoolProperty(
         name="Export for LumberYard",
         description="Export for LumberYard engine instead of CryEngine.",
         default=False,
     )
-    make_layer = BoolProperty(
+    make_layer : BoolProperty(
         name="Make LYR File",
         description="Makes a LYR to reassemble your scene in CryEngine.",
         default=False,
     )
-    disable_rc = BoolProperty(
+    disable_rc : BoolProperty(
         name="Disable RC",
         description="Do not run the resource compiler.",
         default=False,
     )
-    save_dae = BoolProperty(
+    save_dae : BoolProperty(
         name="Save DAE File",
         description="Save the DAE file for developing purposes.",
         default=False,
     )
-    save_tiffs = BoolProperty(
+    save_tiffs : BoolProperty(
         name="Save TIFFs",
         description="Saves TIFF images that are generated during conversion to DDS.",
         default=False,
     )
-    run_in_profiler = BoolProperty(
+    run_in_profiler : BoolProperty(
         name="Profile BCry Exporter",
         description="Select only if you want to profile BCry Exporter.",
         default=False,
@@ -3007,7 +3107,7 @@ class Export(bpy.types.Operator, ExportHelper):
 
         box = col.box()
         box.label(text="General", icon="WORLD")
-        box.prop(self, "apply_modifiers")
+        box.prop(self, "apply_modifiers")#TODO: Here apply_modifiers is set
         box.prop(self, "merge_all_nodes")
         box.prop(self, "export_selected_nodes")
         box.prop(self, "custom_normals")
@@ -3048,24 +3148,24 @@ class ExportAnimations(bpy.types.Operator, ExportHelper):
     bl_label = "Export Animations"
     bl_idname = "scene.export_animations"
     filename_ext = ".dae"
-    filter_glob = StringProperty(default="*.dae", options={'HIDDEN'})
+    filter_glob : StringProperty(default="*.dae", options={'HIDDEN'})
 
-    export_for_lumberyard = BoolProperty(
+    export_for_lumberyard : BoolProperty(
         name="Export for LumberYard",
         description="Export for LumberYard engine instead of CryEngine.",
         default=False,
     )
-    disable_rc = BoolProperty(
+    disable_rc : BoolProperty(
         name="Disable RC",
         description="Do not run the resource compiler.",
         default=False,
     )
-    save_dae = BoolProperty(
+    save_dae : BoolProperty(
         name="Save DAE File",
         description="Save the DAE file for developing purposes.",
         default=False,
     )
-    run_in_profiler = BoolProperty(
+    run_in_profiler : BoolProperty(
         name="Profile BCry Exporter",
         description="Select only if you want to profile BCry Exporter.",
         default=False,
@@ -3152,84 +3252,84 @@ class QuickExport(bpy.types.Operator, ExportHelper):
     bl_idname = "scene.export_to_game_quick"
     bl_options = {'REGISTER', 'UNDO'}
     filename_ext = ".dae"
-    filter_glob = StringProperty(default="*.dae", options={'HIDDEN'})
+    filter_glob : StringProperty(default="*.dae", options={'HIDDEN'})
 
-    apply_modifiers = BoolProperty(
+    apply_modifiers : BoolProperty(
         name="Apply Modifiers",
         description="Apply all modifiers for objects before exporting.",
         default=True,
     )
-    merge_all_nodes = BoolProperty(
+    merge_all_nodes : BoolProperty(
         name="Merge All Nodes",
         description=desc.list["merge_all_nodes"],
         default=False,
     )
-    export_selected_nodes = BoolProperty(
+    export_selected_nodes : BoolProperty(
         name="Export Selected Nodes",
         description="Just exports selected nodes.",
         default=False,
     )
-    custom_normals = BoolProperty(
+    custom_normals : BoolProperty(
         name="Use Custom Normals",
         description="Use custom normals.",
         default=False,
     )
-    vcloth_pre_process = BoolProperty(
+    vcloth_pre_process : BoolProperty(
         name="VCloth Pre-Process",
         description="Export skin as simulating mesh for VCloth V2.",
         default=False,
     )
-    generate_materials = BoolProperty(
+    generate_materials : BoolProperty(
         name="Generate Materials",
         description="Generate material files for CryEngine.",
         default=False,
     )
-    convert_textures = BoolProperty(
+    convert_textures : BoolProperty(
         name="Convert Textures",
         description="Converts source textures to DDS while exporting materials.",
         default=False,
     )
-    make_chrparams = BoolProperty(
+    make_chrparams : BoolProperty(
         name="Make CHRPARAMS File",
         description="Create a base CHRPARAMS file for character animations.",
         default=False,
     )
-    make_cdf = BoolProperty(
+    make_cdf : BoolProperty(
         name="Make CDF File",
         description="Create a base CDF file for character attachments.",
         default=False,
     )
-    fix_weights = BoolProperty(
+    fix_weights : BoolProperty(
         name="Fix Weights",
         description="For use with .chr files. Generally a good idea.",
         default=False,
     )
-    export_for_lumberyard = BoolProperty(
+    export_for_lumberyard : BoolProperty(
         name="Export for LumberYard",
         description="Export for LumberYard engine instead of CryEngine.",
         default=False,
     )
-    make_layer = BoolProperty(
+    make_layer : BoolProperty(
         name="Make LYR File",
         description="Makes a LYR to reassemble your scene in CryEngine.",
         default=False,
     )
-    disable_rc = BoolProperty(
+    disable_rc : BoolProperty(
         name="Disable RC",
         description="Do not run the resource compiler.",
         default=False,
     )
-    save_dae = BoolProperty(
+    save_dae : BoolProperty(
         name="Save DAE File",
         description="Save the DAE file for developing purposes.",
         default=False,
     )
-    save_tiffs = BoolProperty(
+    save_tiffs : BoolProperty(
         name="Save TIFFs",
         description="Saves TIFF images that are generated during conversion to DDS.",
         default=False,
     )
-    run_in_profiler = BoolProperty(
+    run_in_profiler : BoolProperty(
         name="Profile BCry Exporter",
         description="Select only if you want to profile BCry Exporter.",
         default=False,
@@ -3346,7 +3446,7 @@ class ErrorHandler(bpy.types.Operator):
     bl_label = "Error:"
     bl_idname = "screen.display_error"
 
-    message = bpy.props.StringProperty()
+    message : bpy.props.StringProperty()
 
     def execute(self, context):
         return {'FINISHED'}
@@ -3488,6 +3588,15 @@ class BoneUtilitiesPanel(View3DPanel, Panel):
         layout = self.layout
         col = layout.column(align=True)
 
+        #TODO: GetMeInThere
+        col.operator(
+            "armature.add_export_property",
+            text="Add Export Property To Bones",
+            icon="BONE_DATA")
+        col.operator(
+            "armature.remove_export_property",
+            text="Remove Export Property To Bones",
+            icon="BONE_DATA")
         col.operator(
             "armature.add_root_bone",
             text="Add Root Bone",
@@ -3786,6 +3895,14 @@ class BoneUtilitiesMenu(bpy.types.Menu):
         layout = self.layout
 
         layout.label(text="Skeleton")
+        layout.operator(#TODO:GetMeInThere2
+            "armature.add_export_property",
+            text="Add Export Property To Bones",
+            icon="BONE_DATA")
+        layout.operator(
+            "armature.remove_export_property",
+            text="Remoce Export Property To Bones",
+            icon="BONE_DATA")
         layout.operator(
             "armature.add_root_bone",
             text="Add Root Bone",
@@ -4054,6 +4171,8 @@ def get_classes_to_register():
         AddMaterialProperties,
         DiscardMaterialProperties,
         GenerateMaterials,
+        AddExportPropertyToBone,#TODO: MaybeHere
+        RemoveExportPropertyToBone,
         AddRootBone,
         AddLocatorLocomotion,
         AddPrimitiveMesh,

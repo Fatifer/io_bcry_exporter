@@ -33,6 +33,7 @@ from collections import OrderedDict
 from datetime import datetime
 from mathutils import Matrix, Vector
 from time import perf_counter
+from itertools import chain
 from xml.dom.minidom import Document, Element, parse, parseString
 import bmesh
 import copy
@@ -176,18 +177,93 @@ class CrytekDaeExporter:
     def _export_library_geometries(self, parent_element):
         libgeo = self._doc.createElement("library_geometries")
         parent_element.appendChild(libgeo)
+        is_select, is_mod = False, False
+        
+        actionName = None
+        hadFakeUser = False
+        #rotationEuler = None
+        
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.context.scene.frame_set(1)
+        
+        AnimationList = []
+        
         for group in utils.get_mesh_export_nodes(
                 self._config.export_selected_nodes):
-            for object_ in group.objects:
+            for object_ in group.objects: 
                 if object_.type != 'MESH':
                     continue
-
+                bpy.ops.object.select_all(action='DESELECT')
+#if object has animation on it clear it and make sure animation is saved to fake user
+                if object_.animation_data:
+                    actionName = object_.animation_data.action.name
+                    if object_.animation_data.action.use_fake_user == True:
+                        hadFakeUser = True
+                    AnimationList += [(object_, actionName, hadFakeUser)]
+                    object_.animation_data.action.use_fake_user = True
+                    object_.animation_data_clear()
+                    #rotationEuler = object_.rotation_euler
+                    object_.rotation_euler = [0,0,0]
+                    #Select current object
+                    bpy.ops.object.select_all(action='DESELECT')
+                    bpy.data.objects[object_.name].select_set(True)
+                    bpy.context.view_layer.objects.active = object_ #bpy.context.scene.objects[object_.name]
+                    #Clear rotation for current object
+                    bpy.ops.object.rotation_clear()
+                    bpy.ops.object.select_all(action='DESELECT')
+                
                 apply_modifiers = self._config.apply_modifiers
                 if utils.get_node_type(group) in ('chr', 'skin'):
                     apply_modifiers = False
-
-                if apply_modifiers == True:
+#TODO: ApplyModifiers is not the same as Transform_apply
+                if apply_modifiers == True and actionName == None:
                     bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+                    # bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)                   
+                    # contx = bpy.context.copy()
+                    # contx['object'] = object_
+
+                    # modifiers = modifier_type(object_)
+                    # collect_names = []
+                    # for mod in modifiers[:]:
+                    #     contx['modifier'] = mod
+                    #     is_mod = True
+                    #     try:
+                    #         bpy.ops.object.modifier_apply(
+                    #                             contx,
+                    #                             modifier=contx['modifier'].name
+                    #                             )
+
+                    #         bpy.ops.object.gpencil_modifier_apply(
+                    #                             modifier=contx['modifier'].name
+                    #                             )
+                    #     except:
+                    #         obj_name = getattr(obj, "name", "NO NAME")
+                    #         collect_names.append(obj_name)
+                    #         message_b = True
+                    #         pass
+
+                    
+                    # if is_select:
+                    #             if is_mod:
+                    #                 message_a = "Applying modifiers on all Selected Objects"
+                    #             else:
+                    #                 message_a = "No Modifiers on Selected Objects"
+                    # else:
+                    #             self.report({"INFO"}, "No Selection. No changes applied")
+                    #             return {'CANCELLED'}
+
+                    # # applying failed for some objects, show report
+                    # message_obj = (",".join(collect_names) if collect_names and
+                    #             len(collect_names) < 8 else "some objects (Check System Console)")
+
+                    # self.report({"INFO"},
+                    #             (message_a if not message_b else
+                    #             "Applying modifiers failed for {}".format(message_obj)))
+
+                    # if (collect_names and message_obj == "some objects (Check System Console)"):
+                    #     print("\n[Modifier Tools]\n\nApplying failed on:"
+                    #         "\n\n{} \n".format(", ".join(collect_names)))
+
 
                 bmesh_, backup_info = utils.get_bmesh(object_)
                 geometry_node = self._doc.createElement("geometry")
@@ -197,46 +273,46 @@ class CrytekDaeExporter:
 
                 print()
                 bcPrint(
-                    '"{}" object is being processed...'.format(
+                     '"{}" object is being processed...'.format(
                         object_.name))
 
-                start_time = clock()
+                start_time = perf_counter()
                 self._write_positions(bmesh_, mesh_node, geometry_name)
                 bcPrint(
                     'Positions have been written {:.4f} seconds.'.format(
-                        clock() - start_time))
+                        perf_counter() - start_time))
 
-                start_time = clock()
+                start_time = perf_counter()
                 self._write_normals(object_, bmesh_, mesh_node, geometry_name)
                 bcPrint(
                     'Normals have been written {:.4f} seconds.'.format(
-                        clock() - start_time))
+                        perf_counter() - start_time))
 
-                start_time = clock()
+                start_time = perf_counter()
                 self._write_uvs(object_, bmesh_, mesh_node, geometry_name)
                 bcPrint(
                     'UVs have been written {:.4f} seconds.'.format(
-                        clock() - start_time))
+                        perf_counter() - start_time))
 
-                start_time = clock()
+                start_time = perf_counter()
                 self._write_vertex_colors(
                     object_, bmesh_, mesh_node, geometry_name)
                 bcPrint(
                     'Vertex colors have been written {:.4f} seconds.'.format(
-                        clock() - start_time))
+                        perf_counter() - start_time))
 
-                start_time = clock()
+                start_time = perf_counter()
                 self._write_vertices(mesh_node, geometry_name)
                 bcPrint(
                     'Vertices have been written {:.4f} seconds.'.format(
-                        clock() - start_time))
+                        perf_counter() - start_time))
 
-                start_time = clock()
+                start_time = perf_counter()
                 self._write_triangle_list(
                     object_, bmesh_, mesh_node, geometry_name)
                 bcPrint(
                     'Triangle list have been written {:.4f} seconds.'.format(
-                        clock() - start_time))
+                        perf_counter() - start_time))
 
                 extra = self._create_double_sided_extra("MAYA")
                 mesh_node.appendChild(extra)
@@ -247,6 +323,25 @@ class CrytekDaeExporter:
                 bcPrint(
                     '"{}" object has been processed for "{}" node.'.format(
                         object_.name, group.name))
+                
+#restore the action to the object and reset the carrier variables actionName and hadFakeUser
+                # if actionName:
+                #     object_.animation_data_create()
+                #     object_.animation_data.action = bpy.data.actions.get(actionName)
+                #     if hadFakeUser != True:
+                #         object_.animation_data.action.use_fake_user = False
+                        
+                actionName = None
+                hadFakeUser = False
+        self._reassignAnimation(AnimationList)
+
+    def _reassignAnimation(self, AnimationList):
+        for t in AnimationList:
+            t[0].animation_data_create()
+            t[0].animation_data.action = bpy.data.actions.get(t[1]) 
+            if t[2] != True:
+                t[0].animation_data.action.use_fake_user = False
+
 
     def _write_positions(self, bmesh_, mesh_node, geometry_name):
         float_positions = []
@@ -312,14 +407,16 @@ class CrytekDaeExporter:
             if active_layer.name.lower() == 'alpha':
                 alpha_found = True
                 for vert in bmesh_.verts:
-                    loop = vert.link_loops[0]
-                    color = loop[active_layer]
-                    alpha_color = (color[0] + color[1] + color[2]) / 3.0
-                    float_colors.extend([1.0, 1.0, 1.0, alpha_color])
+                    if len(vert.link_loops) > 0:
+                        loop = vert.link_loops[0]
+                        color = loop[active_layer]
+                        alpha_color = (color[0] + color[1] + color[2]) / 3.0
+                        float_colors.extend([1.0, 1.0, 1.0, alpha_color])
             else:
                 for vert in bmesh_.verts:
-                    loop = vert.link_loops[0]
-                    float_colors.extend(loop[active_layer])
+                    if len(vert.link_loops) > 0:
+                        loop = vert.link_loops[0]
+                        float_colors.extend(loop[active_layer])
 
         if float_colors:
             id_ = "{!s}-vcol".format(geometry_name)
@@ -428,12 +525,11 @@ class CrytekDaeExporter:
 # -------------------------------------------------------------------------
 # Library Controllers: --> Skeleton Armature and List of Bone Names
 #                      --> Skin Geometry, Weights, Transform Matrices
-# -------------------------------------------------------------------------
-
+# -------------------------------------------------------------------------    
     def _export_library_controllers(self, parent_element):
         library_node = self._doc.createElement("library_controllers")
 
-        ALLOWED_NODE_TYPES = ('chr', 'skin')
+        ALLOWED_NODE_TYPES = ('chr', 'skin')#TODO: HERE downward
         for group in utils.get_mesh_export_nodes(
                 self._config.export_selected_nodes):
             node_type = utils.get_node_type(group)
@@ -474,7 +570,7 @@ class CrytekDaeExporter:
         joints = self._doc.createElement("joints")
         input = utils.write_input(id_, None, "joints", "JOINT")
         joints.appendChild(input)
-        input = utils.write_input(id_, None, "matrices", "INV_BIND_MATRIX")
+        input = utils.write_input(id_, None, "matrices", "INV_BIND_MATRIX") #TODO: INV_BIND_MATRIX
         joints.appendChild(input)
         skin_node.appendChild(joints)
 
@@ -488,13 +584,16 @@ class CrytekDaeExporter:
             bone_name = "{!s}{!s}".format(bone.name, props_name)
             bone_names.append(bone_name)
         source = utils.write_source(id_, "IDREF", bone_names, [])
-        skin_node.appendChild(source)
+        skin_node.appendChild(source)       
 
     def _process_bone_matrices(self, object_, armature, skin_node):
 
         bones = utils.get_bones(armature)
         bone_matrices = []
-        for bone in armature.pose.bones:
+        for bone in armature.pose.bones: #TODO: EVERYWHERE it should check if "ExportBone" in bone
+            # if not "ExportBone" in bone:
+                # continue
+        
 
             bone_matrix = utils.transform_bone_matrix(bone)
             bone_matrices.extend(utils.matrix_to_array(bone_matrix))
@@ -513,20 +612,43 @@ class CrytekDaeExporter:
         bone_list = {}
 
         for bone_id, bone in enumerate(bones):
-            bone_list[bone.name] = bone_id
+            bone_list[bone.name] = bone_id #TODO:BoneList
+
 
         for vertex in object_.data.vertices:
             vertex_group_count = 0
-            for group in vertex.groups:
-                group_name = object_.vertex_groups[group.group].name
-                if (group.weight == 0 or
+            for vgroup in vertex.groups:
+                group_name = object_.vertex_groups[vgroup.group].name
+                # print(group_name)
+                # if (vgroup.weight == 0 ):
+                #     print("SKIPPED FOR-WEIGHT--------------------------------------------:")
+                #     print(group_name)
+                #     continue
+                # else:
+                #     print("Didnt skipp tor weight == 0")
+                #     print(group_name)
+                #     print(vgroup.weight)
+                
+                # if(group_name not in bone_list):
+                #     print("SKIPPED FOR-GRPNAME--------------------------------------------:")
+                #     print(group_name)
+                #     continue
+                # else:
+                #     print("Didnt skipp tor name")
+                #     print(group_name)
+
+                if (vgroup.weight == 0 or
                         group_name not in bone_list):
+                    # print("SKIPPED FOR---------------------------------------------:")
+                    # print(group_name)
                     continue
                 if vertex_group_count == 8:
                     bcPrint("Too many bone references in {}:{} vertex group"
                             .format(object_.name, group_name))
                     continue
-                group_weights.append(group.weight)
+                group_weights.append(vgroup.weight)
+                # print(group_name)
+                # print("-------------------------------------------------NEVER SKIPED")
                 vw = "{}{} {} ".format(vw, bone_list[group_name], vertex_count)
                 vertex_count += 1
                 vertex_group_count += 1

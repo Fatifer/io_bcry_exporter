@@ -60,17 +60,11 @@ def transform_bone_matrix(bone):
     y_axis = bone.x_axis
     z_axis = -bone.z_axis
 
-    row_x = Vector((x_axis @ i1, x_axis @ i2, x_axis @ i3)) #Blender 2.8+ * -> @ Binary Operator  (V * V is now V @ V)
+    row_x = Vector((x_axis @ i1, x_axis @ i2, x_axis @ i3))
     row_y = Vector((y_axis @ i1, y_axis @ i2, y_axis @ i3))
     row_z = Vector((z_axis @ i1, z_axis @ i2, z_axis @ i3))
-
-    #row_x = Vector((Vector(x * y for x, y in zip(x_axis, i1)), Vector(x * y for x, y in zip(x_axis, i2)), Vector(x * y for x, y in zip(x_axis, i3))))
-    #row_y = Vector((Vector(x * y for x, y in zip(y_axis, i1)), Vector(x * y for x, y in zip(y_axis, i2)), Vector(x * y for x, y in zip(y_axis, i3)))) 
-    #row_z = Vector((Vector(x * y for x, y in zip(z_axis, i1)), Vector(x * y for x, y in zip(z_axis, i2)), Vector(x * y for x, y in zip(z_axis, i3)))) 
-
-
+    
     trans_matrix = Matrix((row_x, row_y, row_z))
-
     location = trans_matrix @ bone.matrix.translation
     bone_matrix = trans_matrix.to_4x4()
     bone_matrix.translation = -location
@@ -85,7 +79,7 @@ def transform_animation_matrix(matrix):
 
     new_matrix = eu.to_matrix()
     new_matrix = new_matrix.to_4x4()
-    new_matrix.translation = matrix.translation
+    new_matrix.translation = matrix.translation 
 
     return new_matrix
 
@@ -885,7 +879,7 @@ def is_dummy(object_):
 
 
 #------------------------------------------------------------------------------
-# Fakebones:
+# Fakebones: 
 #------------------------------------------------------------------------------
 
 
@@ -922,19 +916,24 @@ def add_fakebones(group=None):
     time.sleep(0.5)
 
     scene.frame_set(scene.frame_start)
-    for pose_bone in armature.pose.bones:
+    for pose_bone in armature.pose.bones:#TODO: EVERYWHERE FakeBones dont know if it makes sense REWRITE: if "ExportBone" in pose_bone
+        # if not "ExportBone" in pose_bone:
+        #     continue
+        
+        
         bone_matrix = transform_bone_matrix(pose_bone)
         loc, rot, scl = bone_matrix.decompose()
-
-        bpy.ops.mesh.primitive_cube_add(size=.01) #Changed radius to size
+        
+        bpy.ops.mesh.primitive_cube_add(size=0.1) #changed radius to size
         fakebone = bpy.context.active_object
         fakebone.matrix_world = bone_matrix
         fakebone.scale = (1, 1, 1)
         fakebone.name = pose_bone.name
         fakebone["fakebone"] = "fakebone"
-        bpy.context.view_layer.objects.active = armature #scene.objects.active = armature API Changed from 2.7 to 2.8
+        bpy.context.view_layer.objects.active = armature # changed from scene.objects.active = armature to and with line below :)
+        armature.select_set(state = True) #armature.select_set(state = True, view_layer = None)
         armature.data.bones.active = pose_bone.bone
-        bpy.ops.object.parent_set(type='BONE_RELATIVE')
+        bpy.ops.object.parent_set(type='BONE_RELATIVE') 
 
         if group:
             group.objects.link(fakebone)
@@ -953,8 +952,10 @@ def remove_fakebones():
         bpy.ops.object.mode_set(mode='OBJECT')
     deselect_all()
     for fakebone in get_type("fakebones"):
-        fakebone.select_set(True)
-        bpy.ops.object.delete(use_global=False)
+        #bpy.context.view_layer.objects.active = fakebone
+        #fakebone.select_set(True)
+        bpy.data.objects.remove(fakebone, do_unlink=True)
+        #bpy.ops.object.delete(use_global=False)
     if old_mode != 'OBJECT':
         bpy.ops.object.mode_set(mode=old_mode)
 
@@ -984,12 +985,18 @@ def get_keyframes(armature):
 
         locations = {}
         rotations = {}
-
+        
         for bone in armature.pose.bones:
+            # if not "ExportBone" in bone:
+            #     continue
+            #for the first child
             bone_matrix = transform_animation_matrix(bone.matrix)
             if bone.parent and bone.parent.parent:
+
                 parent_matrix = transform_animation_matrix(bone.parent.matrix)
-                bone_matrix = parent_matrix.inverted() * bone_matrix
+                
+                bone_matrix = parent_matrix.inverted() @ bone_matrix
+                                
             elif bone.name == 'Locator_Locomotion':
                 bone_matrix = bone.matrix
             elif not bone.parent:
@@ -1030,6 +1037,9 @@ def set_keyframe(armature, frame, location_list, rotation_list):
     bpy.context.scene.frame_set(frame)
 
     for bone in armature.pose.bones:
+        # if not "ExportBone" in bone:
+        #     continue
+        
         index = frame - bpy.context.scene.frame_start
 
         fakeBone = bpy.data.objects[bone.name]
@@ -1055,6 +1065,8 @@ def apply_animation_scale(armature):
     deselect_all()
     scene.frame_set(scene.frame_start)
     for pose_bone in armature.pose.bones:
+        # if not "ExportBone" in pose_bone:
+        #     continue
         bmatrix = pose_bone.bone.head_local
         bpy.ops.object.empty_add(type='PLAIN_AXES', radius=0.1)
         empty = bpy.context.active_object
@@ -1101,6 +1113,8 @@ def apply_animation_scale(armature):
     bpy.ops.pose.user_transforms_clear()
 
     for pose_bone in armature.pose.bones:
+        # if not "ExportBone" in pose_bone:
+        #     continue
         pose_bone.constraints.new(type='COPY_LOCATION')
         pose_bone.constraints.new(type='COPY_ROTATION')
 
@@ -1342,8 +1356,8 @@ def get_armature():
         return object_
 
 
-def get_bones(armature):
-    return [bone for bone in armature.data.bones]
+def get_bones(armature):#TODO: Get just the ExportBone taged bones
+    return [bone for bone in armature.data.bones]# if "ExportBone" in bone]
 
 
 def get_animation_node_range(object_, node_name, initial_start, initial_end):
